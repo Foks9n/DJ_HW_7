@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from advertisements.models import Advertisement, Favorite
+from advertisements.models import Advertisement
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,26 +42,7 @@ class AdvertisementSerializer(serializers.ModelSerializer):
 
         # TODO: добавьте требуемую валидацию
         creator = self.context['request'].user
-        if not self.instance:
-            if Advertisement.objects.filter(creator=creator).count() > 9:
+        if not self.instance or data.get('status', None) == 'OPEN':
+            if Advertisement.objects.filter(creator=creator, status='OPEN').count() > 9:
                 raise serializers.ValidationError(f'Превышено число открытых объявлений')
         return data
-
-
-class FavoriteSerializer(serializers.ModelSerializer):
-    person = UserSerializer(
-        read_only=True,
-    )
-    advertisement = AdvertisementSerializer(
-        read_only=True
-    )
-
-    class Meta:
-        model = Favorite
-        fields = ('person', 'advertisement', )
-
-    def create(self, validated_data):
-        """Метод для создания"""
-        validated_data['person'] = self.context['request'].user
-        validated_data['advertisement'] = self.context['request']['advertisement']
-        return super().create(validated_data)

@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters, DateFromToRangeFilter
 
-from advertisements.models import Advertisement, Favorite
+from advertisements.models import Advertisement
 
 
 class AdvertisementFilter(filters.FilterSet):
@@ -11,11 +11,4 @@ class AdvertisementFilter(filters.FilterSet):
 
     class Meta:
         model = Advertisement
-        fields = ['creator', 'created_at', ]
-
-class FavoriteFilter(filters.FilterSet):
-    """Фильтры для избранного"""
-
-    class Meta:
-        model = Favorite
-        fields = ['person', ]
+        fields = ['creator', 'created_at', 'status']
